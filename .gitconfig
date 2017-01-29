@@ -1,0 +1,67 @@
+[alias]
+
+  #
+  # Basic shorthands
+  #
+
+  ca = commit --amend --no-edit
+  co = checkout
+  ci = commit
+  st = status
+  br = branch
+  ll = log --graph --oneline --decorate --all
+  #
+  # Working with branches
+  #
+
+  # Get the current branch name (not so useful in itself, but used in
+  # other aliases)
+  branch-name = "!git rev-parse --abbrev-ref HEAD"
+  # Push the current branch to the remote "origin", and set it to track
+  # the upstream branch
+  publish = "!git push -u origin $(git branch-name)"
+  # Delete the remote version of the current branch
+  unpublish = "!git push origin :$(git branch-name)"
+  # Delete a branch and recreate it from master — useful if you have, say,
+  # a development branch and a master branch and they could conceivably go
+  # out of sync
+  recreate = "!f() { [[ -n $@ ]] && git checkout \"$@\" && git unpublish && git checkout master && git branch -D \"$@\" && git checkout -b \"$@\" && git publish; }; f"
+
+  # Interactively rebase all the commits on the current branch
+  rebase-branch = "!git rebase -i `git merge-base master HEAD`"
+
+  #
+  # Working with files
+  #
+
+  # Unstage any files that have been added to the staging area
+  unstage = reset HEAD
+  # Show changes that have been staged
+  diffc = diff --cached
+
+  find = "!git ls-files | grep -i"
+
+  # Mark a file as "assume unchanged", which means that Git will treat it
+  # as though there are no changes to it even if there are. Useful for
+  # temporary changes to tracked files
+  assume = update-index --assume-unchanged
+  # Reverse the above
+  unassume = update-index --no-assume-unchanged
+  # Show the files that are currently assume-unchanged
+  assumed = "!git ls-files -v | grep ^h | cut -c 3-"
+
+  # Checkout our version of a file and add it
+  ours = "!f() { git checkout --ours $@ && git add $@; }; f"
+  # Checkout their version of a file and add it
+  theirs = "!f() { git checkout --theirs $@ && git add $@; }; f"
+
+  # Delete any branches that have been merged into master
+  # See also: https://gist.github.com/robmiller/5133264
+  delete-merged-branches = "!git co master && git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
+
+  # Tags
+  lasttag = describe --tags --abbrev=0
+
+[user]
+	email = o.borjesson@gmail.com
+	name = Oskar Börjesson
